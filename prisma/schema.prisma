@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+generator erd {
+    provider = "prisma-erd-generator"
+    output   = "../erd.png"
+    theme    = "forest"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+    id          String    @id @default(cuid())
+    loginId     String    @unique @map("login_id")
+    photoUrl    String?   @map("photo_url") @db.VarChar(200)
+    name        String    @map("name") @db.VarChar(100)
+    password    String
+    isActive    Boolean   @default(true) @map("is_active")
+
+    createdAt DateTime    @default(now()) @map("created_at")
+    updatedAt DateTime?   @updatedAt @map("updated_at")
+
+    @@index([loginId], name: "LoginIdx")
+    @@map("admins")
+}
+
+model User {
+    id              String    @id @default(cuid())
+    deviceId        String    @unique @map("device_id")
+    name            String    @map("full_name") @db.VarChar(100)
+    photoUrl        String?   @map("photo_url") @db.VarChar(200)
+    isActive        Boolean   @default(true) @map("is_active")
+
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+
+    @@index([deviceId])
+    @@index([name])
+    @@map("users")
+}
